@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>پنل کاربری — Dashboard</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* جدول */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{ text-align:right;padding:12px;border-bottom:1px solid rgba(0,0,0,0.06); color:var(--muted); font-weight:700 }
+  tbody tr {
+    transition: var(--transition);
+  }
+  tbody tr:hover {
+    background: var(--glass);
+  }
+  tbody td{padding:12px;border-bottom:1px solid rgba(0,0,0,0.04)}
+
+  /* پروژه ها */
+  .project{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px;border-radius:10px;background:var(--glass);
+    transition: var(--transition);
+  }
+  .project:hover {
+    background: rgba(55,88,255,0.08);
+  }
+  .project .meta{display:flex;gap:12px;align-items:center}
+
+  /* پروفایل ساید کارت */
+  .profile-card{display:flex;gap:12px;align-items:center}
+  .profile-card img{
+    width:72px;height:72px;border-radius:12px;object-fit:cover;
+    transition: var(--transition);
+  }
+  .profile-card img:hover {
+    transform: scale(1.05);
+  }
+
+  /* فوتر کوچک */
+  .muted{color:var(--muted);font-size:13px}
+
+  /* تم تاریک سوییچ */
+  .theme-switch{
+    display:flex;align-items:center;gap:10px;background:var(--card);padding:8px;border-radius:999px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .theme-switch:hover {
+    transform: scale(1.05);
+  }
+  .theme-switch input{display:none}
+  .toggle{
+    width:42px;height:24px;border-radius:999px;background:linear-gradient(90deg, #cbd5e1, #e6eef9);position:relative;padding:3px;cursor:pointer
+  }
+  .toggle .dot{
+    width:18px;height:18px;border-radius:50%;background:white;position:absolute;right:3px;top:3px;transition:all 0.2s;
+  }
+  input#theme-toggle:checked + .toggle .dot{ right:calc(100% - 21px); background: #111827; }
+
+  /* نمودارها */
+  .chart-container {
+    height: 250px;
+    position: relative;
+    margin-top: 16px;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .chart-date {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">داشبورد مدیریت</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">عضو از: 1403/01/20</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" class="active" title="داشبورد">📊 داشبورد <span class="badge">جدید</span></a>
+      <a href="customers.html" title="مشتریان">🧑‍💼 مشتریان <span class="badge">5 جدید</span></a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها <span class="badge">12</span></a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" title="پشتیبانی">💬 تیکت‌ها</a>
+      <a href="users.html" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div class="pill">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجو در پنل..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- داشبورد -->
+    <section class="grid" style="align-items:start">
+      <!-- آمار سریع -->
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۱۲</div>
+            <div class="small">پروژه‌ها</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent)">📁</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۸</div>
+            <div class="small">تراکنش‌ها</div>
+          </div>
+          <div style="font-size:22px;color:var(--success)">💳</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۳</div>
+            <div class="small">پیام‌های خوانده‌نشده</div>
+          </div>
+          <div style="font-size:22px;color:var(--danger)">📩</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۲۵,۴۰۰,۰۰۰</div>
+            <div class="small">درآمد خالص ماهانه</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent-2)">💰</div>
+        </div>
+      </div>
+
+      <!-- نمودار فروش ماهانه -->
+      <div class="col-6 card">
+        <div class="chart-header">
+          <div style="font-weight:800">نمودار فروش ماهانه</div>
+          <div class="chart-date">1404/03/01 - 1404/03/30</div>
+        </div>
+        <div class="chart-container">
+          <svg viewBox="0 0 100 40" width="100%" height="100%" preserveAspectRatio="none" style="display:block">
+            <rect x="0" y="0" width="100" height="40" fill="url(#salesGradient)" opacity="0.1" rx="4"></rect>
+            <path d="M0,35 L10,30 L20,25 L30,20 L40,15 L50,10 L60,15 L70,20 L80,25 L90,30 L100,35" 
+                  fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+            <defs>
+              <linearGradient id="salesGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- نمودار رشد کاربران -->
+      <div class="col-6 card">
+        <div class="chart-header">
+          <div style="font-weight:800">رشد کاربران</div>
+          <div class="chart-date">1403/10 - 1404/03</div>
+        </div>
+        <div class="chart-container">
+          <svg viewBox="0 0 100 40" width="100%" height="100%" preserveAspectRatio="none" style="display:block">
+            <rect x="0" y="0" width="100" height="40" fill="url(#usersGradient)" opacity="0.1" rx="4"></rect>
+            <path d="M0,35 L10,32 L20,28 L30,24 L40,20 L50,18 L60,15 L70,12 L80,8 L90,5 L100,2" 
+                  fill="none" stroke="var(--success)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></path>
+            <defs>
+              <linearGradient id="usersGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="var(--success)" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="var(--success)" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+      </div>
+
+      <!-- لیست پروژه‌ها -->
+      <div class="col-4 card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">پروژه‌های اخیر</div>
+          <a href="projects.html" class="muted" style="text-decoration:none">مشاهده همه</a>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="project">
+            <div class="meta"><div style="width:10px;height:10px;background:#fed7aa;border-radius:6px"></div><div style="font-weight:700">طراحی وب‌سایت فروشگاهی</div></div>
+            <div class="muted">در حال انجام</div>
+          </div>
+
+          <div class="project">
+            <div class="meta"><div style="width:10px;height:10px;background:#bbf7d0;border-radius:6px"></div><div style="font-weight:700">سامانه گزارش‌گیری</div></div>
+            <div class="muted">تکمیل شده</div>
+          </div>
+
+          <div class="project">
+            <div class="meta"><div style="width:10px;height:10px;background:#c7d2fe;border-radius:6px"></div><div style="font-weight:700">اپ موبایل</div></div>
+            <div class="muted">انتظار</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- تراکنش‌ها (جدول نمونه) -->
+      <div class="col-8 card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800">تراکنش‌های اخیر</div>
+          <div class="muted">آخرین ۳۰ روز</div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>تاریخ</th>
+              <th>شناسه</th>
+              <th>کاربر</th>
+              <th>مبلغ</th>
+              <th>وضعیت</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1404/04/20</td>
+              <td>#A1234</td>
+              <td>رضا حسینی</td>
+              <td>۱,۴۰۰,۰۰۰ تومان</td>
+              <td style="color:var(--success);font-weight:700">موفق</td>
+            </tr>
+            <tr>
+              <td>1404/04/18</td>
+              <td>#A1220</td>
+              <td>مریم پور</td>
+              <td>۳۲۰,۰۰۰ تومان</td>
+              <td style="color:var(--danger);font-weight:700">ناموفق</td>
+            </tr>
+            <tr>
+              <td>1404/04/12</td>
+              <td>#A1205</td>
+              <td>علی کریمی</td>
+              <td>۵۶۰,۰۰۰ تومان</td>
+              <td style="color:var(--accent);font-weight:700">در انتظار</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- پروفایل خلاصه و اعلان‌ها -->
+      <div class="col-3 card">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="profile-card">
+            <img src="https://i.pravatar.cc/150?img=12" alt="پروفایل">
+            <div>
+              <div style="font-weight:800">محمد حسین</div>
+              <div class="muted">مدیر</div>
+              <div style="margin-top:8px"><a href="profile.html" class="muted" style="text-decoration:none">ویرایش پروفایل</a></div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-weight:700;margin-bottom:8px">اعلان‌ها</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:var(--glass);padding:10px;border-radius:8px">سفارش #A1234 با موفقیت پردازش شد.</div>
+              <div style="background:var(--glass);padding:10px;border-radius:8px">پیام جدید از کاربر مریم پور.</div>
+              <a href="tickets.html" class="muted" style="text-decoration:none">مشاهده همه اعلان‌ها</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- فعالیت‌های اخیر -->
+      <div class="col-9 card">
+        <div style="font-weight:800;margin-bottom:8px">فعالیت اخیر</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;border-radius:8px;background:var(--glass);display:flex;gap:10px;align-items:center">
+            <div style="color:var(--accent)">📊</div>
+            <div>1404/04/20 — رضا حسینی پرداخت جدید ثبت کرد.</div>
+          </div>
+          <div style="padding:10px;border-radius:8px;background:var(--glass);display:flex;gap:10px;align-items:center">
+            <div style="color:var(--success)">📁</div>
+            <div>1404/04/18 — پروژه "اپ موبایل" ساختار اولیه دریافت کرد.</div>
+          </div>
+          <div style="padding:10px;border-radius:8px;background:var(--glass);display:flex;gap:10px;align-items:center">
+            <div style="color:var(--accent-2)">👤</div>
+            <div>1404/04/12 — کاربر جدید ثبت‌نام کرد.</div>
+          </div>
+          <div style="padding:10px;border-radius:8px;background:var(--glass);display:flex;gap:10px;align-items:center">
+            <div style="color:var(--danger)">⚠️</div>
+            <div>1404/04/10 — خطا در پردازش تراکنش #A1198</div>
+          </div>
+          <div style="padding:10px;border-radius:8px;background:var(--glass);display:flex;gap:10px;align-items:center">
+            <div style="color:var(--success)">💳</div>
+            <div>1404/04/08 — اشتراک جدید برای کاربر علی کریمی فعال شد.</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <div style="height:24px"></div>
+<footer style="color:var(--muted);font-size:13px; text-align:center;">
+    © تمام حقوق برای شما محفوظ است — پنل TITAK
+</footer>
+  </main>
+</div>
+
+<script>
+  // برای فعال کردن تم تاریک به صورت پویا
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // بررسی وضعیت ذخیره شده در localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      themeToggle.checked = true;
+    }
+    
+    // تغییر تم با کلیک
+    themeToggle.addEventListener('change', function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', this.checked);
+    });
+  });
+</script>
+</body>
+</html>

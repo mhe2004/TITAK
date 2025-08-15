@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>مدیریت تیکت‌ها — Dashboard</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* جدول */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{ text-align:right;padding:12px;border-bottom:1px solid rgba(0,0,0,0.06); color:var(--muted); font-weight:700 }
+  tbody tr {
+    transition: var(--transition);
+  }
+  tbody tr:hover {
+    background: var(--glass);
+  }
+  tbody td{padding:12px;border-bottom:1px solid rgba(0,0,0,0.04)}
+
+  /* تیکت‌ها */
+  .ticket-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-open { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+  .status-pending { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+  .status-resolved { background: rgba(22, 163, 74, 0.1); color: var(--success); }
+  .status-closed { background: rgba(107, 114, 128, 0.1); color: var(--muted); }
+  .status-urgent { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+  .ticket-priority {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 6px;
+  }
+  .priority-high { background: var(--danger); }
+  .priority-medium { background: #eab308; }
+  .priority-low { background: var(--success); }
+
+  /* پروفایل ساید کارت */
+  .profile-card{display:flex;gap:12px;align-items:center}
+  .profile-card img{
+    width:72px;height:72px;border-radius:12px;object-fit:cover;
+    transition: var(--transition);
+  }
+  .profile-card img:hover {
+    transform: scale(1.05);
+  }
+
+  /* فوتر کوچک */
+  .muted{color:var(--muted);font-size:13px}
+
+  /* تم تاریک سوییچ */
+  .theme-switch{
+    display:flex;align-items:center;gap:10px;background:var(--card);padding:8px;border-radius:999px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .theme-switch:hover {
+    transform: scale(1.05);
+  }
+  .theme-switch input{display:none}
+  .toggle{
+    width:42px;height:24px;border-radius:999px;background:linear-gradient(90deg, #cbd5e1, #e6eef9);position:relative;padding:3px;cursor:pointer
+  }
+  .toggle .dot{
+    width:18px;height:18px;border-radius:50%;background:white;position:absolute;right:3px;top:3px;transition:all 0.2s;
+  }
+  input#theme-toggle:checked + .toggle .dot{ right:calc(100% - 21px); background: #111827; }
+
+  /* فیلترها */
+  .filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">تیکت های پشتیبانی</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">عضو از: 1403/01/20</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" title="داشبورد">📊 داشبورد</a>
+      <a href="customers.html" title="مشتریان">🧑‍💼 مشتریان</a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها</a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" class="active" title="پشتیبانی">💬 تیکت‌ها <span class="badge">5 جدید</span></a>
+      <a href="users.html" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div class="pill">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجو در تیکت‌ها..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه تیکت‌ها -->
+    <section class="grid" style="align-items:start">
+      <!-- آمار تیکت‌ها -->
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۵</div>
+            <div class="small">تیکت‌های جدید</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent)">📩</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۱۲</div>
+            <div class="small">در حال بررسی</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent-2)">⏳</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۲</div>
+            <div class="small">فوری</div>
+          </div>
+          <div style="font-size:22px;color:var(--danger)">⚠️</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۹۴٪</div>
+            <div class="small">رضایت کاربران</div>
+          </div>
+          <div style="font-size:22px;color:var(--success)">😊</div>
+        </div>
+      </div>
+
+      <!-- لیست تیکت‌ها -->
+      <div class="col-12 card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-weight:800;font-size:18px">همه تیکت‌ها</div>
+          <a href="new-ticket.html" class="btn">تیکت جدید +</a>
+        </div>
+
+        <div class="filters">
+          <div class="filter-btn active">همه تیکت‌ها</div>
+          <div class="filter-btn">جدید</div>
+          <div class="filter-btn">در حال بررسی</div>
+          <div class="filter-btn">پاسخ داده شده</div>
+          <div class="filter-btn">بسته شده</div>
+          <div class="filter-btn">فوری</div>
+          
+          <div style="margin-inline-start:auto;display:flex;gap:12px">
+            <select style="padding:8px 12px;border-radius:8px;background:var(--glass);border:1px solid var(--border);font-size:13px">
+              <option>مرتب‌سازی: جدیدترین</option>
+              <option>قدیمی‌ترین</option>
+              <option>اولویت بالا</option>
+            </select>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>شناسه تیکت</th>
+              <th>موضوع</th>
+              <th>کاربر</th>
+              <th>تاریخ ایجاد</th>
+              <th>اولویت</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>#TKT-1404-254</td>
+              <td>مشکل در پرداخت آنلاین</td>
+              <td>رضا حسینی</td>
+              <td>1404/04/20 - 14:30</td>
+              <td>بالا <span class="ticket-priority priority-high"></span></td>
+              <td><span class="ticket-status status-open">باز</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">پاسخ</a>
+              </td>
+            </tr>
+            <tr>
+              <td>#TKT-1404-253</td>
+              <td>سوال درباره قابلیت‌های جدید</td>
+              <td>مریم پور</td>
+              <td>1404/04/20 - 13:15</td>
+              <td>متوسط <span class="ticket-priority priority-medium"></span></td>
+              <td><span class="ticket-status status-pending">در حال بررسی</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">پاسخ</a>
+              </td>
+            </tr>
+            <tr>
+              <td>#TKT-1404-252</td>
+              <td>مشکل در ورود به سیستم</td>
+              <td>علی کریمی</td>
+              <td>1404/04/20 - 11:45</td>
+              <td>بالا <span class="ticket-priority priority-high"></span></td>
+              <td><span class="ticket-status status-open">باز</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">پاسخ</a>
+              </td>
+            </tr>
+            <tr>
+              <td>#TKT-1404-251</td>
+              <td>پیشنهاد ویژگی جدید</td>
+              <td>سارا محمدی</td>
+              <td>1404/04/19 - 16:20</td>
+              <td>پایین <span class="ticket-priority priority-low"></span></td>
+              <td><span class="ticket-status status-resolved">پاسخ داده شده</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">مشاهده</a>
+              </td>
+            </tr>
+            <tr>
+              <td>#TKT-1404-250</td>
+              <td>مشکل در دانلود فایل</td>
+              <td>محمد رضایی</td>
+              <td>1404/04/19 - 10:10</td>
+              <td>متوسط <span class="ticket-priority priority-medium"></span></td>
+              <td><span class="ticket-status status-closed">بسته شده</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">مشاهده</a>
+              </td>
+            </tr>
+            <tr>
+              <td>#TKT-1404-249</td>
+              <td>خرابی سرور</td>
+              <td>فاطمه احمدی</td>
+              <td>1404/04/18 - 18:30</td>
+              <td>بالا <span class="ticket-priority priority-high"></span></td>
+              <td><span class="ticket-status status-urgent">فوری</span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">پاسخ</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- تیکت‌های نیاز به پاسخ -->
+      <div class="col-8 card">
+        <div style="font-weight:800;margin-bottom:16px;font-size:18px">تیکت‌های نیاز به پاسخ</div>
+        
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <!-- تیکت 1 -->
+          <div style="padding:16px;border-radius:12px;background:var(--glass);border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:700">#TKT-1404-254 - مشکل در پرداخت آنلاین</div>
+              <div style="font-size:12px;color:var(--muted)">رضا حسینی</div>
+            </div>
+            <div style="margin-bottom:12px;font-size:14px">
+              هنگام پرداخت آنلاین با پیغام خطای "تراکنش ناموفق" مواجه می‌شوم. این مشکل از دیروز شروع شده و قبلاً چنین مشکلی نداشتم.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;gap:8px">
+                <span class="ticket-status status-open">باز</span>
+                <span style="font-size:12px;color:var(--muted)">1404/04/20 - 14:30</span>
+              </div>
+              <a href="#" class="btn" style="padding:6px 12px;font-size:13px">پاسخ به تیکت</a>
+            </div>
+          </div>
+          
+          <!-- تیکت 2 -->
+          <div style="padding:16px;border-radius:12px;background:var(--glass);border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:700">#TKT-1404-252 - مشکل در ورود به سیستم</div>
+              <div style="font-size:12px;color:var(--muted)">علی کریمی</div>
+            </div>
+            <div style="margin-bottom:12px;font-size:14px">
+              پس از وارد کردن نام کاربری و رمز عبور، سیستم پیغام "اطلاعات ورود نامعتبر است" نمایش می‌دهد در حالی که مطمئنم اطلاعات را صحیح وارد می‌کنم.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;gap:8px">
+                <span class="ticket-status status-open">باز</span>
+                <span style="font-size:12px;color:var(--muted)">1404/04/20 - 11:45</span>
+              </div>
+              <a href="#" class="btn" style="padding:6px 12px;font-size:13px">پاسخ به تیکت</a>
+            </div>
+          </div>
+          
+          <!-- تیکت 3 -->
+          <div style="padding:16px;border-radius:12px;background:var(--glass);border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-weight:700">#TKT-1404-249 - خرابی سرور</div>
+              <div style="font-size:12px;color:var(--muted)">فاطمه احمدی</div>
+            </div>
+            <div style="margin-bottom:12px;font-size:14px">
+              از ظهر امروز سرورهای شما بسیار کند شده‌اند و بعضی وقت‌ها اصلاً پاسخ نمی‌دهند. این مشکل روی کار ما تأثیر جدی گذاشته است.
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="display:flex;gap:8px">
+                <span class="ticket-status status-urgent">فوری</span>
+                <span style="font-size:12px;color:var(--muted)">1404/04/18 - 18:30</span>
+              </div>
+              <a href="#" class="btn" style="padding:6px 12px;font-size:13px">پاسخ به تیکت</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- آمار پاسخگویی -->
+      <div class="col-4 card">
+        <div style="font-weight:800;margin-bottom:16px;font-size:18px">آمار پاسخگویی</div>
+        
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:14px">میانگین زمان پاسخ</div>
+              <div style="font-weight:700">۲ ساعت و ۱۵ دقیقه</div>
+            </div>
+            <div style="width:100%;height:6px;background:var(--glass);border-radius:999px">
+              <div style="width:75%;height:100%;background:var(--accent);border-radius:999px"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:14px">تیکت‌های پاسخ داده شده</div>
+              <div style="font-weight:700">۸۷٪</div>
+            </div>
+            <div style="width:100%;height:6px;background:var(--glass);border-radius:999px">
+              <div style="width:87%;height:100%;background:var(--success);border-radius:999px"></div>
+            </div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+              <div style="font-size:14px">رضایت کاربران</div>
+              <div style="font-weight:700">۹۴٪</div>
+            </div>
+            <div style="width:100%;height:6px;background:var(--glass);border-radius:999px">
+              <div style="width:94%;height:100%;background:var(--accent-2);border-radius:999px"></div>
+            </div>
+          </div>
+          
+          <div style="margin-top:16px">
+            <div style="font-weight:700;margin-bottom:8px">دسته‌بندی تیکت‌ها</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;justify-content:space-between">
+                <div style="font-size:13px">مشکلات فنی</div>
+                <div style="font-size:13px;font-weight:700">۴۵٪</div>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <div style="font-size:13px">سوالات مالی</div>
+                <div style="font-size:13px;font-weight:700">۲۵٪</div>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <div style="font-size:13px">پیشنهادات</div>
+                <div style="font-size:13px;font-weight:700">۱۵٪</div>
+              </div>
+              <div style="display:flex;justify-content:space-between">
+                <div style="font-size:13px">سایر</div>
+                <div style="font-size:13px;font-weight:700">۱۵٪</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:24px"></div>
+    <footer style="color:var(--muted);font-size:13px" class="muted">© تمام حقوق برای شما محفوظ است — پنل مدیریت تیکت‌ها</footer>
+  </main>
+</div>
+
+<script>
+  // برای فعال کردن تم تاریک به صورت پویا
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // بررسی وضعیت ذخیره شده در localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      themeToggle.checked = true;
+    }
+    
+    // تغییر تم با کلیک
+    themeToggle.addEventListener('change', function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', this.checked);
+    });
+
+    // فعال کردن فیلترها
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>پروفایل کاربری — پنل مدیریت</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* فرم پروفایل */
+  .profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .form-group input, 
+  .form-group select, 
+  .form-group textarea {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    transition: var(--transition);
+  }
+  .form-group input:focus, 
+  .form-group select:focus, 
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(55, 88, 255, 0.1);
+  }
+  .form-row {
+    display: flex;
+    gap: 16px;
+  }
+  .form-row .form-group {
+    flex: 1;
+  }
+  
+  /* آواتار کاربر */
+  .avatar-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--glass);
+    transition: var(--transition);
+  }
+  .avatar-upload-btn {
+    padding: 8px 16px;
+    background: var(--glass);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: var(--transition);
+    border: none;
+  }
+  .avatar-upload-btn:hover {
+    background: rgba(55, 88, 255, 0.1);
+  }
+  
+  /* دکمه‌ها */
+  .btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: #2a4bd9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .btn-secondary {
+    background: var(--glass);
+    color: var(--text);
+  }
+  .btn-secondary:hover {
+    background: rgba(15,23,42,0.08);
+  }
+  
+  /* تب‌ها */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+  }
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .tab:hover:not(.active) {
+    color: var(--text);
+  }
+  
+  /* کارت اطلاعات */
+  .info-card {
+    background: var(--glass);
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  .info-card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+  .info-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-row:last-child {
+    border-bottom: none;
+  }
+  .info-label {
+    flex: 1;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .info-value {
+    flex: 2;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">پروفایل کاربری</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">مدیر سیستم</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" title="داشبورد">📊 داشبورد</a>
+      <a href="customers.html" title="مشتریان">🧑‍💼 مشتریان</a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" class="active" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها</a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" title="پشتیبانی">💬 تیکت‌ها</a>
+      <a href="users.html" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div class="pill">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجو در پروفایل..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه پروفایل -->
+    <section class="grid" style="align-items:start">
+      <!-- اطلاعات کاربر -->
+      <div class="col-4 card">
+        <div class="avatar-upload">
+          <img src="https://i.pravatar.cc/150?img=12" alt="پروفایل کاربر" class="avatar-preview">
+          <button class="avatar-upload-btn">تغییر تصویر پروفایل</button>
+        </div>
+        
+        <div style="margin-top:20px;">
+          <div style="font-size:18px;font-weight:700;text-align:center">محمد حسین افتخاری</div>
+          <div style="color:var(--muted);text-align:center;margin-top:4px">مدیر سیستم</div>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)"> کدملی:</span>
+            <span style="font-weight:600">0123456789</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)"> تاریخ تولد:</span>
+            <span style="font-weight:600">1382/11/10</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)"> محل سکونت</span>
+            <span style="font-weight:600">قم</span>
+          </div>
+          <div style="margin-top:24px;">
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--muted)">عضویت از:</span>
+              <span style="font-weight:600">1403/01/20</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)">
+              <span style="color:var(--muted)">آخرین ورود:</span>
+              <span style="font-weight:600">1403/05/15 - 14:30</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 0;">
+              <span style="color:var(--muted)">وضعیت:</span>
+              <span style="color:var(--success);font-weight:600">فعال</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- تب‌ها و فرم اصلی -->
+      <div class="col-8 card">
+        <div class="tabs">
+          <div class="tab active">اطلاعات شخصی</div>
+          <div class="tab">تنظیمات امنیتی</div>
+          <div class="tab">اعلان‌ها</div>
+          <div class="tab">فعالیت‌ها</div>
+        </div>
+        
+        <form class="profile-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first-name">نام</label>
+              <input type="text" id="first-name" value="محمدحسین">
+            </div>
+            <div class="form-group">
+              <label for="last-name">نام خانوادگی</label>
+              <input type="text" id="last-name" value="افتخاری">
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">ایمیل</label>
+            <input type="email" id="email" value="mohammad@gmail.com">
+          </div>
+          
+          <div class="form-group">
+            <label for="phone">تلفن همراه</label>
+            <input type="tel" id="phone" value="09123456789">
+          </div>
+          
+          <div class="form-group">
+            <label for="bio">درباره من</label>
+            <textarea id="bio" rows="3">مدیر سیستم با 5 سال سابقه کار در توسعه وب اپلیکیشن‌ها</textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="country">کشور</label>
+              <select id="country">
+                <option value="IR" selected>ایران</option>
+                <option value="US">آمریکا</option>
+                <option value="CA">کانادا</option>
+                <option value="UK">انگلیس</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="city">شهر</label>
+              <select id="country">
+                <option value="IR" selected>قم</option>
+                <option value="US">تهران</option>
+                <option value="CA">شیراز</option>
+                <option value="UK">مشهد</option>
+              </select>
+            </div>
+          </div>
+          
+          <div style="display:flex;gap:12px;margin-top:16px;">
+            <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+            <button type="button" class="btn btn-secondary">انصراف</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- اطلاعات حساب -->
+      <div class="col-6 card">
+        <h2 style="margin-top:0;margin-bottom:16px;font-size:18px;">اطلاعات حساب</h2>
+        
+        <div class="info-card">
+          <h3>اطلاعات ورود</h3>
+          <div class="info-row">
+            <div class="info-label">نام کاربری</div>
+            <div class="info-value">mohammad_admin</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">آخرین تغییر رمز</div>
+            <div class="info-value">1403/03/10</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">تایید دو مرحله‌ای</div>
+            <div class="info-value" style="color:var(--success)">فعال</div>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <h3>اشتراک فعلی</h3>
+          <div class="info-row">
+            <div class="info-label">نوع اشتراک</div>
+            <div class="info-value" style="color:var(--accent)">پرمیوم (یکساله)</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">تاریخ شروع</div>
+            <div class="info-value">1403/02/15</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">تاریخ انقضا</div>
+            <div class="info-value">1404/02/15</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- فعالیت‌های اخیر -->
+      <div class="col-6 card">
+        <h2 style="margin-top:0;margin-bottom:16px;font-size:18px;">فعالیت‌های اخیر</h2>
+        
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;gap:12px;padding:12px;background:var(--glass);border-radius:8px;">
+            <div style="color:var(--accent);font-size:20px;">📝</div>
+            <div>
+              <div style="font-weight:600;">ویرایش پروفایل</div>
+              <div style="font-size:13px;color:var(--muted)">1403/05/10 - 14:30</div>
+            </div>
+          </div>
+          
+          <div style="display:flex;gap:12px;padding:12px;background:var(--glass);border-radius:8px;">
+            <div style="color:var(--success);font-size:20px;">🔒</div>
+            <div>
+              <div style="font-weight:600;">تغییر رمز عبور</div>
+              <div style="font-size:13px;color:var(--muted)">1403/04/25 - 09:15</div>
+            </div>
+          </div>
+          
+          <div style="display:flex;gap:12px;padding:12px;background:var(--glass);border-radius:8px;">
+            <div style="color:var(--accent-2);font-size:20px;">💳</div>
+            <div>
+              <div style="font-weight:600;">تمدید اشتراک</div>
+              <div style="font-size:13px;color:var(--muted)">1403/04/10 - 16:45</div>
+            </div>
+          </div>
+          
+          <div style="display:flex;gap:12px;padding:12px;background:var(--glass);border-radius:8px;">
+            <div style="color:var(--danger);font-size:20px;">⚠️</div>
+            <div>
+              <div style="font-weight:600;">ورود ناموفق</div>
+              <div style="font-size:13px;color:var(--muted)">1403/03/28 - 22:10</div>
+            </div>
+          </div>
+          
+          <a href="#" style="text-align:center;font-size:13px;color:var(--accent);text-decoration:none;margin-top:8px;">
+            مشاهده همه فعالیت‌ها
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:24px"></div>
+    <footer style="color:var(--muted);font-size:13px" class="muted">© تمام حقوق برای شما محفوظ است — پنل پروفایل کاربری</footer>
+  </main>
+</div>
+<script>
+    // برای فعال کردن تم تاریک به صورت پویا
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      
+      // بررسی وضعیت ذخیره شده در localStorage
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        themeToggle.checked = true;
+      }
+      
+      // تغییر تم با کلیک
+      themeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', this.checked);
+      });
+    });
+  </script>
+</body>
+</html>

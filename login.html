@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ورود | ثبت‌نام</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary-color: #5e50ee;
+            --primary-hover: #4939d4;
+            --secondary-color: #38b000;
+            --secondary-hover: #2e8b00;
+            --accent-color: #667eea;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+        
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #444;
+        }
+        
+        .auth-container {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 480px;
+            width: 100%;
+            padding: 40px 35px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .auth-container:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-header img {
+            height: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .auth-header h2 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .auth-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        
+        .auth-tabs {
+            border-bottom: none;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-tabs .nav-link {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #888;
+            border: none;
+            padding: 12px 30px;
+            margin: 0 5px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tabs .nav-link:hover {
+            color: var(--primary-color);
+            background: rgba(94, 80, 238, 0.1);
+        }
+        
+        .auth-tabs .nav-link.active {
+            color: white;
+            background: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(94, 80, 238, 0.3);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 1.5px solid #e0e0e0;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(94, 80, 238, 0.25);
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px 0 0 10px !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 12px 0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(94, 80, 238, 0.3);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 12px 0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-success:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 176, 0, 0.3);
+        }
+        
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 25px 0;
+        }
+        
+        .divider::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            z-index: 1;
+        }
+        
+        .divider span {
+            background: #fff;
+            position: relative;
+            z-index: 2;
+            padding: 0 15px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google {
+            background: #DB4437;
+        }
+        
+        .facebook {
+            background: #4267B2;
+        }
+        
+        .twitter {
+            background: #1DA1F2;
+        }
+        
+        .forgot-link {
+            color: var(--warning-color);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .forgot-link:hover {
+            color: #d1146a;
+            text-decoration: underline;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+        
+        /* انیمیشن‌ها */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tab-pane {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* استایل‌های اعتبارسنجی */
+        input:invalid {
+            border-color: #ff4444 !important;
+        }
+        
+        input:valid {
+            border-color: #00C851 !important;
+        }
+        
+        input:focus:invalid {
+            box-shadow: 0 0 0 0.25rem rgba(255, 68, 68, 0.25) !important;
+        }
+        
+        input:focus:valid {
+            box-shadow: 0 0 0 0.25rem rgba(0, 200, 81, 0.25) !important;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* ریسپانسیو */
+        @media (max-width: 576px) {
+            .auth-container {
+                padding: 30px 20px;
+                margin: 15px;
+            }
+            
+            .auth-tabs .nav-link {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <!-- هدر -->
+        <div class="auth-header">
+            <img src="assets/img/logo2.png" alt="DITAC Logo" class="logo">
+            <h2>به تیتک خوش آمدید!</h2>
+            <p>لطفا برای ادامه وارد حساب کاربری خود شوید</p>
+        </div>
+
+        <!-- تب‌های ورود/ثبت‌نام -->
+        <ul class="nav nav-tabs auth-tabs mb-4" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">
+                    <i class="fas fa-sign-in-alt me-2"></i>ورود
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">
+                    <i class="fas fa-user-plus me-2"></i>ثبت‌نام
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- بخش ورود -->
+            <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                <form action="panel.html" method="get" autocomplete="off" novalidate>
+                    <div class="mb-3">
+                        <label for="login-username" class="form-label">نام کاربری یا ایمیل</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                            <input id="login-username" type="text" name="username" class="form-control" 
+                                   placeholder="ایمیل یا نام کاربری خود را وارد کنید" 
+                                   required
+                                   minlength="4"
+                                   maxlength="50"
+                                   pattern="[a-zA-Z0-9._%+-@]+"
+                                   title="لطفاً یک نام کاربری یا ایمیل معتبر وارد کنید" />
+                        </div>
+                        <div class="error-message">نام کاربری باید حداقل 4 کاراکتر داشته باشد</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">رمز عبور</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input id="login-password" type="password" name="password" class="form-control" 
+                                   placeholder="رمز عبور خود را وارد کنید" 
+                                   required
+                                   minlength="6"
+                                   maxlength="20"
+                                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$"
+                                   title="رمز عبور باید حداقل 6 کاراکتر و شامل حروف و اعداد باشد" />
+                            <span class="input-group-text password-toggle" onclick="togglePassword('login-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="error-message">رمز عبور باید حداقل 6 کاراکتر و شامل حروف و اعداد باشد</div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="rememberMe" />
+                            <label class="form-check-label" for="rememberMe">مرا به خاطر بسپار</label>
+                        </div>
+                        <a href="#forgot-password" class="forgot-link" onclick="showForgotPassword()">
+                            <i class="fas fa-key me-1"></i>رمز عبور را فراموش کرده‌ام؟
+                        </a>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">
+                        <i class="fas fa-sign-in-alt me-2"></i>ورود به حساب
+                    </button>
+                    
+                    <div class="divider">
+                        <span>یا ورود با</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <a href="#" class="social-btn google">
+                            <i class="fab fa-google"></i>
+                        </a>
+                        <a href="#" class="social-btn facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-btn twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- بخش ثبت‌نام -->
+            <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                <form autocomplete="off" novalidate>
+                    <div class="mb-3">
+                        <label for="register-fullname" class="form-label">نام کامل</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                            <input id="register-fullname" type="text" class="form-control" 
+                                   placeholder="نام و نام خانوادگی خود را وارد کنید" 
+                                   required
+                                   minlength="3"
+                                   maxlength="50"
+                                   pattern="[\u0600-\u06FF\s]+"
+                                   title="لطفاً فقط از حروف فارسی استفاده کنید" />
+                        </div>
+                        <div class="error-message">نام باید حداقل 3 کاراکتر فارسی داشته باشد</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-email" class="form-label">ایمیل</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            <input id="register-email" type="email" class="form-control" 
+                                   placeholder="ایمیل خود را وارد کنید" 
+                                   required
+                                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                                   title="لطفاً یک ایمیل معتبر وارد کنید (مثال: example@domain.com)" />
+                        </div>
+                        <div class="error-message">لطفاً یک ایمیل معتبر وارد کنید</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-password" class="form-label">رمز عبور</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input id="register-password" type="password" class="form-control" 
+                                   placeholder="رمز عبور" 
+                                   required
+                                   minlength="8"
+                                   maxlength="20"
+                                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                                   title="رمز عبور باید حداقل 8 کاراکتر و شامل حروف و اعداد باشد" />
+                            <span class="input-group-text password-toggle" onclick="togglePassword('register-password')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <small class="text-muted">حداقل 8 کاراکتر شامل حروف و اعداد</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="register-password-confirm" class="form-label">تکرار رمز عبور</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                            <input id="register-password-confirm" type="password" class="form-control" 
+                                   placeholder="رمز عبور را تکرار کنید" 
+                                   required
+                                   minlength="8"
+                                   maxlength="20"
+                                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$"
+                                   title="رمز عبور باید حداقل 8 کاراکتر و شامل حروف و اعداد باشد" />
+                            <span class="input-group-text password-toggle" onclick="togglePassword('register-password-confirm')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="error-message">رمز عبور باید با فیلد قبلی مطابقت داشته باشد</div>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="agreeTerms" required />
+                        <label class="form-check-label" for="agreeTerms">
+                            با <a href="#" class="text-primary">شرایط و قوانین</a> موافقم
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-user-plus me-2"></i>ثبت‌نام
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- بخش بازیابی رمز عبور (مخفی) -->
+        <div class="mt-4" id="forgot-password" style="display: none;">
+            <h5 class="mb-3 text-center" style="color: var(--primary-color);">
+                <i class="fas fa-key me-2"></i>بازیابی رمز عبور
+            </h5>
+            <p class="text-muted text-center mb-4">لطفا ایمیل خود را وارد کنید تا لینک بازیابی برای شما ارسال شود</p>
+            <form autocomplete="off" novalidate>
+                <div class="mb-3">
+                    <label for="forgot-email" class="form-label">ایمیل شما</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input id="forgot-email" type="email" class="form-control" 
+                               placeholder="example@domain.com" 
+                               required
+                               pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                               title="لطفاً یک ایمیل معتبر وارد کنید" />
+                    </div>
+                    <div class="error-message">لطفاً یک ایمیل معتبر وارد کنید</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3">
+                    <i class="fas fa-paper-plane me-2"></i>ارسال لینک بازیابی
+                </button>
+                <div class="text-center">
+                    <a href="#" class="text-primary" onclick="hideForgotPassword()">
+                        <i class="fas fa-arrow-right me-1"></i>بازگشت به صفحه ورود
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="auth-footer">
+            <p>آیا سوالی دارید؟ <a href="#">با پشتیبانی تماس بگیرید</a></p>
+            <p class="mt-2">© 2023 شرکت شما. تمام حقوق محفوظ است.</p>
+        </div>
+    </div>
+
+    <!-- اسکریپت‌های مورد نیاز -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // نمایش/پنهان کردن رمز عبور
+        function togglePassword(id) {
+            const passwordField = document.getElementById(id);
+            const toggleIcon = passwordField.nextElementSibling.querySelector('i');
+            
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                passwordField.type = "password";
+                toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+        
+        // نمایش بخش بازیابی رمز عبور
+        function showForgotPassword() {
+            event.preventDefault();
+            document.querySelector('.tab-content').style.display = 'none';
+            document.querySelector('.auth-tabs').style.display = 'none';
+            document.getElementById('forgot-password').style.display = 'block';
+        }
+        
+        // پنهان کردن بخش بازیابی رمز عبور
+        function hideForgotPassword() {
+            event.preventDefault();
+            document.querySelector('.tab-content').style.display = 'block';
+            document.querySelector('.auth-tabs').style.display = 'flex';
+            document.getElementById('forgot-password').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>تنظیمات سیستم — Dashboard</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* تنظیمات */
+  .settings-section {
+    margin-bottom: 24px;
+  }
+  .settings-section h2 {
+    font-size: 18px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-item:last-child {
+    border-bottom: none;
+  }
+  .setting-info {
+    flex: 1;
+  }
+  .setting-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .setting-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .setting-control {
+    margin-right: 16px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+  }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--accent);
+  }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+
+  /* تب‌ها */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .tab {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: 600;
+    border-bottom: 2px solid transparent;
+    transition: var(--transition);
+  }
+  .tab.active {
+    border-bottom: 2px solid var(--accent);
+    color: var(--accent);
+  }
+  .tab-content {
+    display: none;
+  }
+  .tab-content.active {
+    display: block;
+  }
+
+  /* فوتر کوچک */
+  .muted{color:var(--muted);font-size:13px}
+
+  /* تم تاریک سوییچ */
+  .theme-switch{
+    display:flex;align-items:center;gap:10px;background:var(--card);padding:8px;border-radius:999px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .theme-switch:hover {
+    transform: scale(1.05);
+  }
+  .theme-switch input{display:none}
+  .toggle{
+    width:42px;height:24px;border-radius:999px;background:linear-gradient(90deg, #cbd5e1, #e6eef9);position:relative;padding:3px;cursor:pointer
+  }
+  .toggle .dot{
+    width:18px;height:18px;border-radius:50%;background:white;position:absolute;right:3px;top:3px;transition:all 0.2s;
+  }
+  input#theme-toggle:checked + .toggle .dot{ right:calc(100% - 21px); background: #111827; }
+
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">تنظیمات پنل</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">عضو از: 1403/01/20</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" title="داشبورد">📊 داشبورد</a>
+      <a href="customers.html" title="مشتریان">🧑‍💼 مشتریان</a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها</a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" title="پشتیبانی">💬 تیکت‌ها</a>
+      <a href="users.html" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" class="active" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div style="font-size:12px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:999px">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجو در تنظیمات..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه تنظیمات -->
+    <section class="grid" style="align-items:start">
+      <!-- تب‌های تنظیمات -->
+      <div class="col-12 card">
+        <div class="tabs">
+          <div class="tab active" data-tab="general">تنظیمات عمومی</div>
+          <div class="tab" data-tab="security">امنیتی</div>
+          <div class="tab" data-tab="notifications">اعلان‌ها</div>
+          <div class="tab" data-tab="payment">پرداخت‌ها</div>
+          <div class="tab" data-tab="advanced">پیشرفته</div>
+        </div>
+
+        <!-- تب عمومی -->
+        <div class="tab-content active" id="general">
+          <div class="settings-section">
+            <h2>اطلاعات سیستم</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">نام سیستم</div>
+                <div class="setting-desc">نامی که در عنوان صفحات و ایمیل‌ها نمایش داده می‌شود</div>
+              </div>
+              <div class="setting-control">
+                <input type="text" value="پنل مدیریت MP" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:300px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">آدرس ایمیل سیستم</div>
+                <div class="setting-desc">ایمیلی که اطلاع‌رسانی‌ها از آن ارسال می‌شود</div>
+              </div>
+              <div class="setting-control">
+                <input type="email" value="noreply@mp-panel.ir" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:300px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">زبان پیش‌فرض</div>
+                <div class="setting-desc">زبان اصلی سیستم</div>
+              </div>
+              <div class="setting-control">
+                <select style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:300px">
+                  <option>فارسی</option>
+                  <option>English</option>
+                  <option>العربیة</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>تنظیمات ظاهری</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">تم سیستم</div>
+                <div class="setting-desc">انتخاب تم تاریک یا روشن برای پنل مدیریت</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" id="system-theme">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">رنگ اصلی سیستم</div>
+                <div class="setting-desc">رنگ آکسانتی که در سراسر سیستم استفاده می‌شود</div>
+              </div>
+              <div class="setting-control">
+                <input type="color" value="#3758ff" style="width:40px;height:40px;border-radius:8px;border:1px solid var(--border);cursor:pointer">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تب امنیتی -->
+        <div class="tab-content" id="security">
+          <div class="settings-section">
+            <h2>تنظیمات ورود</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">احراز هویت دو مرحله‌ای</div>
+                <div class="setting-desc">برای ورود به سیستم نیاز به کد ارسال شده به موبایل یا ایمیل باشد</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">حداکثر تلاش ناموفق</div>
+                <div class="setting-desc">تعداد دفعاتی که کاربر می‌تواند با رمز اشتباه وارد شود</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="5" min="1" max="10" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">مدت زمان قفل حساب</div>
+                <div class="setting-desc">دقیقه</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="30" min="1" max="1440" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px">
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>تنظیمات رمز عبور</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">حداقل طول رمز عبور</div>
+                <div class="setting-desc">تعداد کاراکترهای مورد نیاز برای رمز عبور</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="8" min="6" max="32" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">اعتبار رمز عبور</div>
+                <div class="setting-desc">تعداد روزهایی که رمز عبور معتبر است</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="90" min="7" max="365" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تب اعلان‌ها -->
+        <div class="tab-content" id="notifications">
+          <div class="settings-section">
+            <h2>تنظیمات اعلان‌ها</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">اعلان‌های سیستمی</div>
+                <div class="setting-desc">نمایش اعلان‌های سیستم در پنل مدیریت</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">اعلان‌های ایمیل</div>
+                <div class="setting-desc">ارسال اعلان‌ها به ایمیل کاربران</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">اعلان‌های پیامکی</div>
+                <div class="setting-desc">ارسال اعلان‌های مهم به شماره موبایل کاربران</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>رویدادهای اعلان</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">ثبت کاربر جدید</div>
+                <div class="setting-desc">ارسال اعلان هنگام ثبت‌نام کاربر جدید</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">ورود موفق</div>
+                <div class="setting-desc">ارسال اعلان هنگام ورود موفقیت‌آمیز کاربر</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">تراکنش مالی</div>
+                <div class="setting-desc">ارسال اعلان برای تراکنش‌های مالی موفق</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تب پرداخت‌ها -->
+        <div class="tab-content" id="payment">
+          <div class="settings-section">
+            <h2>درگاه‌های پرداخت</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">زرین‌پال</div>
+                <div class="setting-desc">فعالسازی درگاه پرداخت زرین‌پال</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">مرچنت زرین‌پال</div>
+                <div class="setting-desc">کد مرچنت درگاه زرین‌پال</div>
+              </div>
+              <div class="setting-control">
+                <input type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:300px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">پی‌پینگ</div>
+                <div class="setting-desc">فعالسازی درگاه پرداخت پی‌پینگ</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>تنظیمات مالی</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">واحد پولی</div>
+                <div class="setting-desc">واحد پولی پیش‌فرض سیستم</div>
+              </div>
+              <div class="setting-control">
+                <select style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:150px">
+                  <option>تومان</option>
+                  <option>ریال</option>
+                  <option>دلار</option>
+                  <option>یورو</option>
+                </select>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">مالیات بر ارزش افزوده</div>
+                <div class="setting-desc">درصد مالیات بر ارزش افزوده</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="9" min="0" max="100" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px"> %
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تب پیشرفته -->
+        <div class="tab-content" id="advanced">
+          <div class="settings-section">
+            <h2>تنظیمات پیشرفته</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">حالت توسعه</div>
+                <div class="setting-desc">فعالسازی حالت توسعه برای نمایش خطاهای سیستم</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">ذخیره لاگ سیستم</div>
+                <div class="setting-desc">ذخیره رویدادهای سیستم در فایل لاگ</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">محدودیت IP</div>
+                <div class="setting-desc">تنها اجازه دسترسی از IPهای مشخص شده</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox">
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h2>پشتیبان‌گیری</h2>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">پشتیبان خودکار</div>
+                <div class="setting-desc">تهیه پشتیبان روزانه از اطلاعات سیستم</div>
+              </div>
+              <div class="setting-control">
+                <label class="switch">
+                  <input type="checkbox" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">ذخیره پشتیبان‌ها</div>
+                <div class="setting-desc">تعداد روزهای نگهداری پشتیبان‌ها</div>
+              </div>
+              <div class="setting-control">
+                <input type="number" value="30" min="1" max="365" style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card);width:80px">
+              </div>
+            </div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <div class="setting-title">آخرین پشتیبان</div>
+                <div class="setting-desc">تاریخ و زمان آخرین پشتیبان گرفته شده</div>
+              </div>
+              <div class="setting-control">
+                <div style="color:var(--muted);font-size:13px">1404/04/20 - 23:45</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ذخیره تنظیمات -->
+      <div class="col-12 card" style="display:flex;justify-content:flex-end;gap:12px">
+        <button class="btn" style="background:var(--glass);color:var(--text);border:1px solid var(--border)">بازنشانی</button>
+        <button class="btn">ذخیره تنظیمات</button>
+      </div>
+    </section>
+
+    <div style="height:24px"></div>
+    <footer style="color:var(--muted);font-size:13px" class="muted">© تمام حقوق برای شما محفوظ است — پنل تنظیمات سیستم</footer>
+  </main>
+</div>
+
+<script>
+  // برای فعال کردن تم تاریک به صورت پویا
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // بررسی وضعیت ذخیره شده در localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      themeToggle.checked = true;
+      document.getElementById('system-theme').checked = true;
+    }
+    
+    // تغییر تم با کلیک
+    themeToggle.addEventListener('change', function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', this.checked);
+      document.getElementById('system-theme').checked = this.checked;
+    });
+
+    // تغییر تم سیستم
+    document.getElementById('system-theme').addEventListener('change', function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', this.checked);
+      themeToggle.checked = this.checked;
+    });
+
+    // فعال کردن تب‌ها
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        // غیرفعال کردن همه تب‌ها
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        
+        // فعال کردن تب انتخاب شده
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

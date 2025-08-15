@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>مدیریت کاربران — Dashboard</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* جدول */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  thead th{ text-align:right;padding:12px;border-bottom:1px solid rgba(0,0,0,0.06); color:var(--muted); font-weight:700 }
+  tbody tr {
+    transition: var(--transition);
+  }
+  tbody tr:hover {
+    background: var(--glass);
+  }
+  tbody td{padding:12px;border-bottom:1px solid rgba(0,0,0,0.04)}
+
+  /* کاربران */
+  .user-role {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .role-admin { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+  .role-editor { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+  .role-support { background: rgba(234, 179, 8, 0.1); color: #eab308; }
+  .role-viewer { background: rgba(107, 114, 128, 0.1); color: var(--muted); }
+
+  .user-status {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 6px;
+  }
+  .status-active { background: var(--success); }
+  .status-inactive { background: var(--muted); }
+  .status-suspended { background: var(--danger); }
+
+  /* پروفایل ساید کارت */
+  .profile-card{display:flex;gap:12px;align-items:center}
+  .profile-card img{
+    width:72px;height:72px;border-radius:12px;object-fit:cover;
+    transition: var(--transition);
+  }
+  .profile-card img:hover {
+    transform: scale(1.05);
+  }
+
+  /* فوتر کوچک */
+  .muted{color:var(--muted);font-size:13px}
+
+  /* تم تاریک سوییچ */
+  .theme-switch{
+    display:flex;align-items:center;gap:10px;background:var(--card);padding:8px;border-radius:999px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .theme-switch:hover {
+    transform: scale(1.05);
+  }
+  .theme-switch input{display:none}
+  .toggle{
+    width:42px;height:24px;border-radius:999px;background:linear-gradient(90deg, #cbd5e1, #e6eef9);position:relative;padding:3px;cursor:pointer
+  }
+  .toggle .dot{
+    width:18px;height:18px;border-radius:50%;background:white;position:absolute;right:3px;top:3px;transition:all 0.2s;
+  }
+  input#theme-toggle:checked + .toggle .dot{ right:calc(100% - 21px); background: #111827; }
+
+  /* فیلترها */
+  .filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 13px;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)"> تنظیمات اعضای سیستم</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">عضو از: 1403/01/20</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" title="داشبورد">📊 داشبورد</a>
+      <a href="customers.html" title="مشتریان">🧑‍💼 مشتریان</a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها</a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" title="پشتیبانی">💬 تیکت‌ها</a>
+      <a href="users.html" class="active" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div style="font-size:12px;padding:4px 8px;background:rgba(255,255,255,0.08);border-radius:999px">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجو در کاربران..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه کاربران -->
+    <section class="grid" style="align-items:start">
+      <!-- آمار کاربران -->
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۱۵</div>
+            <div class="small">کاربران فعال</div>
+          </div>
+          <div style="font-size:22px;color:var(--success)">👥</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۳</div>
+            <div class="small">مدیران سیستم</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent)">👑</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۵</div>
+            <div class="small">کارشناسان پشتیبانی</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent-2)">🛠️</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۲</div>
+            <div class="small">کاربران مسدود شده</div>
+          </div>
+          <div style="font-size:22px;color:var(--danger)">🚫</div>
+        </div>
+      </div>
+
+      <!-- لیست کاربران -->
+      <div class="col-12 card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div style="font-weight:800;font-size:18px">همه کاربران سیستم</div>
+          <a href="new-user.html" class="btn">کاربر جدید +</a>
+        </div>
+
+        <div class="filters">
+          <div class="filter-btn active">همه کاربران</div>
+          <div class="filter-btn">مدیران</div>
+          <div class="filter-btn">ویرایشگران</div>
+          <div class="filter-btn">پشتیبان‌ها</div>
+          <div class="filter-btn">مسدود شده‌ها</div>
+          
+          <div style="margin-inline-start:auto;display:flex;gap:12px">
+            <select style="padding:8px 12px;border-radius:8px;background:var(--glass);border:1px solid var(--border);font-size:13px">
+              <option>مرتب‌سازی: جدیدترین</option>
+              <option>قدیمی‌ترین</option>
+              <option>بر اساس نقش</option>
+            </select>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>کاربر</th>
+              <th>پست الکترونیک</th>
+              <th>نقش</th>
+              <th>تاریخ عضویت</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="https://i.pravatar.cc/40?img=12" style="width:32px;height:32px;border-radius:6px;object-fit:cover">
+                  <div>محمد حسین</div>
+                </div>
+              </td>
+              <td>mohammad@example.com</td>
+              <td><span class="user-role role-admin">مدیر سیستم</span></td>
+              <td>1403/01/20</td>
+              <td>فعال <span class="user-status status-active"></span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">ویرایش</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="https://i.pravatar.cc/40?img=5" style="width:32px;height:32px;border-radius:6px;object-fit:cover">
+                  <div>رضا محمدی</div>
+                </div>
+              </td>
+              <td>reza@example.com</td>
+              <td><span class="user-role role-editor">ویرایشگر</span></td>
+              <td>1403/03/15</td>
+              <td>فعال <span class="user-status status-active"></span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">ویرایش</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="https://i.pravatar.cc/40?img=11" style="width:32px;height:32px;border-radius:6px;object-fit:cover">
+                  <div>مریم کریمی</div>
+                </div>
+              </td>
+              <td>maryam@example.com</td>
+              <td><span class="user-role role-support">پشتیبان</span></td>
+              <td>1403/05/10</td>
+              <td>فعال <span class="user-status status-active"></span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">ویرایش</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="https://i.pravatar.cc/40?img=8" style="width:32px;height:32px;border-radius:6px;object-fit:cover">
+                  <div>علی احمدی</div>
+                </div>
+              </td>
+              <td>ali@example.com</td>
+              <td><span class="user-role role-viewer">نمایشگر</span></td>
+              <td>1403/07/22</td>
+              <td>غیرفعال <span class="user-status status-inactive"></span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">ویرایش</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <img src="https://i.pravatar.cc/40?img=3" style="width:32px;height:32px;border-radius:6px;object-fit:cover">
+                  <div>سارا رضایی</div>
+                </div>
+              </td>
+              <td>sara@example.com</td>
+              <td><span class="user-role role-support">پشتیبان</span></td>
+              <td>1403/09/05</td>
+              <td>مسدود <span class="user-status status-suspended"></span></td>
+              <td>
+                <a href="#" style="color:var(--accent);text-decoration:none;font-size:13px">ویرایش</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ایجاد کاربر جدید -->
+      <div class="col-6 card">
+        <div style="font-weight:800;margin-bottom:16px;font-size:18px">افزودن کاربر جدید</div>
+        
+        <form style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:12px">
+            <div style="flex:1">
+              <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--muted)">نام کامل</label>
+              <input type="text" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card)">
+            </div>
+            <div style="flex:1">
+              <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--muted)">پست الکترونیک</label>
+              <input type="email" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card)">
+            </div>
+          </div>
+          
+          <div style="display:flex;gap:12px">
+            <div style="flex:1">
+              <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--muted)">رمز عبور</label>
+              <input type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card)">
+            </div>
+            <div style="flex:1">
+              <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--muted)">تکرار رمز عبور</label>
+              <input type="password" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card)">
+            </div>
+          </div>
+          
+          <div>
+            <label style="display:block;margin-bottom:6px;font-size:13px;color:var(--muted)">نقش کاربر</label>
+            <select style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card)">
+              <option>مدیر سیستم</option>
+              <option>ویرایشگر</option>
+              <option>پشتیبان</option>
+              <option>نمایشگر</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn" style="margin-top:8px">ثبت کاربر جدید</button>
+        </form>
+      </div>
+
+      <!-- نقش‌ها و دسترسی‌ها -->
+      <div class="col-6 card">
+        <div style="font-weight:800;margin-bottom:16px;font-size:18px">نقش‌ها و دسترسی‌ها</div>
+        
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:var(--glass);padding:12px;border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700">مدیر سیستم</div>
+              <div style="font-size:12px;color:var(--muted)">۳ کاربر</div>
+            </div>
+            <div style="font-size:13px">
+              دسترسی کامل به تمام بخش‌های سیستم، مدیریت کاربران، تنظیمات سیستم و گزارش‌ها
+            </div>
+          </div>
+          
+          <div style="background:var(--glass);padding:12px;border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700">ویرایشگر</div>
+              <div style="font-size:12px;color:var(--muted)">۵ کاربر</div>
+            </div>
+            <div style="font-size:13px">
+              امکان ایجاد و ویرایش محتوا، مدیریت پروژه‌ها، عدم دسترسی به تنظیمات سیستم
+            </div>
+          </div>
+          
+          <div style="background:var(--glass);padding:12px;border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700">پشتیبان</div>
+              <div style="font-size:12px;color:var(--muted)">۴ کاربر</div>
+            </div>
+            <div style="font-size:13px">
+              دسترسی به تیکت‌های پشتیبانی، مشاهده کاربران، عدم توانایی در تغییر تنظیمات
+            </div>
+          </div>
+          
+          <div style="background:var(--glass);padding:12px;border-radius:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700">نمایشگر</div>
+              <div style="font-size:12px;color:var(--muted)">۳ کاربر</div>
+            </div>
+            <div style="font-size:13px">
+              فقط امکان مشاهده گزارش‌ها و آمارها، عدم توانایی در ایجاد یا ویرایش
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:24px"></div>
+    <footer style="color:var(--muted);font-size:13px; text-align:center;">
+        © تمام حقوق برای شما محفوظ است — پنل TITAK
+    </footer>
+  </main>
+</div>
+
+<script>
+  // برای فعال کردن تم تاریک به صورت پویا
+  document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.getElementById('theme-toggle');
+    
+    // بررسی وضعیت ذخیره شده در localStorage
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+      themeToggle.checked = true;
+    }
+    
+    // تغییر تم با کلیک
+    themeToggle.addEventListener('change', function() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', this.checked);
+    });
+
+    // فعال کردن فیلترها
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+</html>

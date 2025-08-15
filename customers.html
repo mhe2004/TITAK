@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>مدیریت مشتریان — پنل کاربری</title>
+
+<style>
+  /* ==========================
+     تنظیمات پایه و متغیرها
+     ========================== */
+  :root{
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --muted:#6b7280;
+    --text:#0f172a;
+    --accent: #3758ff;
+    --accent-2:#06b6d4;
+    --glass: rgba(15,23,42,0.04);
+    --success: #16a34a;
+    --danger: #ef4444;
+    --sidebar: #0f172a;
+    --sidebar-text: #e6eef9;
+    --shadow: 0 6px 18px rgba(15,23,42,0.08);
+    --radius: 12px;
+    --border: rgba(0,0,0,0.05);
+    --transition: all 0.2s ease;
+  }
+  /* تم تاریک */
+  .dark{
+    --bg: #071024;
+    --card:#071a2b;
+    --muted:#9aa7bf;
+    --text:#e6eef9;
+    --accent: #4f8cff;
+    --accent-2:#06b6d4;
+    --glass: rgba(255,255,255,0.03);
+    --success: #34d399;
+    --danger: #fb7185;
+    --sidebar:#042033;
+    --sidebar-text:#dbeafe;
+    --shadow: 0 6px 18px rgba(0,0,0,0.6);
+    --border: rgba(255,255,255,0.05);
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    line-height:1.45;
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  /* ==========================
+     هدر و ساختار کلی
+     ========================== */
+  .wrap{
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  /* checkbox برای toggle سایدبار در موبایل */
+  #sidebar-toggle{ display:none }
+
+  /* سایدبار */
+  .sidebar{
+    width:260px;
+    min-width:220px;
+    background: linear-gradient(180deg, var(--sidebar), rgba(0,0,0,0.02));
+    color:var(--sidebar-text);
+    border-radius: var(--radius);
+    padding:18px;
+    box-shadow: var(--shadow);
+    height: calc(100vh - 40px);
+    position:sticky;
+    top:20px;
+    flex-shrink:0;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:16px;
+  }
+  .brand .logo{
+    width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px;
+    transition: var(--transition);
+  }
+  .brand h1{margin:0;font-size:16px}
+  .profile-sm{
+    display:flex;gap:10px;align-items:center;margin:14px 0 18px;
+  }
+  .profile-sm img{
+    width:46px;height:46px;border-radius:8px;object-fit:cover;
+    border:2px solid rgba(255,255,255,0.06);
+    transition: var(--transition);
+  }
+  .profile-sm .meta{font-size:13px;color:var(--sidebar-text)}
+  
+  /* منوی اصلی */
+  nav.menu{display:flex;flex-direction:column;gap:6px}
+  nav.menu a{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    text-decoration:none;
+    color:var(--sidebar-text);
+    border-radius:8px;
+    font-weight:600;
+    transition: var(--transition);
+  }
+  nav.menu a.active, nav.menu a:active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+  }
+  nav.menu a:hover{background:rgba(255,255,255,0.08)}
+  nav.menu a .badge{
+    margin-inline-start:auto;
+    background:rgba(255,255,255,0.08);
+    padding:3px 8px;border-radius:999px;font-size:12px;color:var(--sidebar-text);
+    transition: var(--transition);
+  }
+
+  /* محتوا اصلی */
+  .content{
+    flex:1;
+    min-width:0;
+  }
+  header.topbar{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:18px;
+  }
+  .hamburger{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:44px;height:44px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);
+    cursor:pointer;
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .hamburger:hover {
+    transform: scale(1.05);
+  }
+  .search{
+    flex:1;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    background:var(--card);
+    padding:10px;border-radius:10px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .search:focus-within {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  .search input{
+    border:0;outline:0;background:transparent;width:100%;font-size:14px;color:var(--text)
+  }
+  .actions{display:flex;gap:10px;align-items:center}
+  .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  .notification-bell:hover {
+    transform: scale(1.1);
+  }
+  .notification-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--danger);
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  /* داشبورد گرید */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:16px;
+  }
+  .col-3{grid-column: span 3;}
+  .col-4{grid-column: span 4;}
+  .col-6{grid-column: span 6;}
+  .col-8{grid-column: span 8;}
+  .col-9{grid-column: span 9;}
+  .col-12{grid-column: span 12;}
+
+  .card{
+    background:var(--card);
+    padding:16px;border-radius:12px;box-shadow:var(--shadow);
+    transition: var(--transition);
+    border: 1px solid var(--border);
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(15,23,42,0.12);
+  }
+  .stat{
+    display:flex;flex-direction:column;gap:10px;
+  }
+  .stat .big{font-size:22px;font-weight:700}
+  .stat .small{color:var(--muted);font-size:13px}
+
+  /* جدول مشتریان */
+  .customers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 16px;
+  }
+  .customers-table th {
+    text-align: right;
+    padding: 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    color: var(--muted);
+    font-weight: 700;
+  }
+  .customers-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+  }
+  .customers-table tr {
+    transition: var(--transition);
+  }
+  .customers-table tr:hover {
+    background: var(--glass);
+  }
+  
+  /* وضعیت‌های مشتری */
+  .customer-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-active {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+  }
+  .status-inactive {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+  }
+  .status-pending {
+    background: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+  }
+  
+  /* دکمه‌های عملیات */
+  .action-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    margin-left: 5px;
+  }
+  .view-btn {
+    background: var(--accent);
+    color: white;
+  }
+  .edit-btn {
+    background: var(--accent-2);
+    color: white;
+  }
+  .delete-btn {
+    background: var(--danger);
+    color: white;
+  }
+  .action-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  /* فیلترها */
+  .filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .filter-group label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .filter-group select, 
+  .filter-group input {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    min-width: 180px;
+  }
+  
+  /* صفحه‌بندی */
+  .pagination {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .page-btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--glass);
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+  }
+  .page-btn.active {
+    background: var(--accent);
+    color: white;
+  }
+  .page-btn:hover {
+    background: var(--glass);
+    transform: translateY(-1px);
+  }
+  
+  /* اطلاعات مشتری */
+  .customer-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .customer-name {
+    font-weight: 600;
+  }
+  .customer-id {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  
+  /* responsive */
+  @media (max-width:1000px){
+    .col-3{grid-column: span 4;}
+    .col-4{grid-column: span 6;}
+    .col-6{grid-column: span 12;}
+    .col-8{grid-column: span 12;}
+    .col-9{grid-column: span 12;}
+  }
+  @media (max-width:860px){
+    .wrap{flex-direction:column}
+    .sidebar{
+      position:fixed;left:20px;top:20px;height:calc(100% - 40px);transform:translateX(0);
+      transition:transform .25s ease;
+      z-index:60;
+    }
+    .sidebar.closed{ transform: translateX(-120%); }
+    .hamburger{display:flex}
+    /* CSS-only: وقتی checkbox تیک نخورده باشد کنار بسته می‌شود */
+    #sidebar-toggle:not(:checked) ~ .wrap .sidebar{ transform: translateX(-120%); }
+    #sidebar-toggle:checked ~ .wrap .sidebar{ transform: translateX(0); }
+    /* overlay */
+    #sidebar-toggle:checked ~ .wrap::before{
+      content:"";position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;border-radius:0;
+    }
+  }
+
+  /* زیباسازی لینک‌ها */
+  a.btn{
+    display:inline-block;padding:8px 12px;border-radius:8px;text-decoration:none;background:var(--accent);color:white;font-weight:700;
+    transition: var(--transition);
+  }
+  a.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(55,88,255,0.3);
+  }
+  .pill{
+    display:inline-block;padding:6px 10px;border-radius:999px;background:var(--glass);font-weight:700;color:var(--muted);
+    transition: var(--transition);
+  }
+
+  /* helper */
+  .row{display:flex;gap:12px;flex-wrap:wrap}
+  .center{display:flex;align-items:center;justify-content:center}
+  
+  /* انیمیشن‌ها */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .card, .sidebar, .topbar {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  /* تأخیر برای انیمیشن‌های کارت‌ها */
+  .grid > *:nth-child(1) { animation-delay: 0.1s; }
+  .grid > *:nth-child(2) { animation-delay: 0.2s; }
+  .grid > *:nth-child(3) { animation-delay: 0.3s; }
+  .grid > *:nth-child(4) { animation-delay: 0.4s; }
+  .grid > *:nth-child(5) { animation-delay: 0.5s; }
+  .grid > *:nth-child(6) { animation-delay: 0.6s; }
+</style>
+</head>
+<body>
+
+<!-- checkbox برای کنترل نمایش سایدبار در موبایل -->
+<input type="checkbox" id="sidebar-toggle" hidden>
+
+<!-- تم تاریک (checkbox) -->
+<input type="checkbox" id="theme-toggle" hidden>
+
+<!-- container اصلی -->
+<label for="sidebar-toggle" class="hamburger" title="باز/بسته کردن منو" style="position:fixed;left:22px;top:26px;z-index:70">
+  <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="6" width="20" height="2" rx="1" fill="#374151"></rect>
+    <rect y="12" width="20" height="2" rx="1" fill="#374151"></rect>
+  </svg>
+</label>
+
+<div class="wrap" id="app">
+  <!-- سایدبار -->
+  <aside class="sidebar" role="navigation" aria-label="سایدبار پنل">
+    <div class="brand">
+      <div class="logo">MP</div>
+      <div>
+        <div style="font-size:13px;font-weight:800">پنل مدیریت</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">مدیریت مشتریان</div>
+      </div>
+    </div>
+
+    <div class="profile-sm">
+      <img src="https://i.pravatar.cc/100?img=12" alt="پروفایل">
+      <div class="meta">
+        <div style="font-weight:700">محمد حسین</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7)">عضو از: 1403/01/20</div>
+      </div>
+    </div>
+
+    <nav class="menu" aria-label="منو اصلی">
+      <a href="panel.html" title="داشبورد">📊 داشبورد</a>
+      <a href="customers.html" class="active" title="مشتریان">🧑‍💼 مشتریان <span class="badge">32</span></a>
+      <a href="subscriptions.html" title="خرید اشتراک">💳 خرید اشتراک</a>
+      <a href="profile.html" title="پروفایل">👤 پروفایل</a>
+      <a href="projects.html" title="پروژه‌ها">📁 پروژه‌ها</a>
+      <a href="transactions.html" title="تراکنش‌ها">💵 تراکنش‌ها</a>
+      <a href="tickets.html" title="پشتیبانی">💬 تیکت‌ها</a>
+      <a href="users.html" title="مدیریت کاربران">👥 کاربران</a>
+      <a href="settings.html" title="تنظیمات">⚙️ تنظیمات</a>
+      <a href="logout.html" title="خروج">🔓 خروج</a>
+    </nav>
+
+    <div style="margin-top:18px;display:flex;gap:8px;align-items:center;justify-content:space-between">
+      <div class="muted" style="font-size:13px">نسخه پنل</div>
+      <div class="pill">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- محتوای اصلی -->
+  <main class="content">
+    <!-- هدر -->
+    <header class="topbar">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="opacity:.6"><path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <input placeholder="جستجوی مشتریان..." aria-label="جستجو">
+      </div>
+
+      <div class="actions">
+        <div class="notification-bell">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div class="notification-badge">3</div>
+        </div>
+        
+        <label for="theme-toggle" class="theme-switch" title="تغییر تم">
+          <svg width="18" height="18" viewBox="0 0 24 24" style="opacity:.7"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.2" fill="none"></circle></svg>
+          <div style="width:8px"></div>
+          <div style="font-size:13px;color:var(--muted)">تم</div>
+        </label>
+
+        <a href="profile.html" class="btn" style="background:linear-gradient(90deg,var(--accent),var(--accent-2))">پروفایل</a>
+      </div>
+    </header>
+
+    <!-- محتوای صفحه مشتریان -->
+    <section class="grid">
+      <!-- آمار سریع -->
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۳۲</div>
+            <div class="small">کل مشتریان</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent)">👥</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۲۸</div>
+            <div class="small">مشتریان فعال</div>
+          </div>
+          <div style="font-size:22px;color:var(--success)">✅</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۴</div>
+            <div class="small">مشتریان جدید</div>
+          </div>
+          <div style="font-size:22px;color:var(--accent-2)">🆕</div>
+        </div>
+      </div>
+
+      <div class="col-3 card stat">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div class="big">۸۵٪</div>
+            <div class="small">رضایت مشتریان</div>
+          </div>
+          <div style="font-size:22px;color:#f59e0b">⭐</div>
+        </div>
+      </div>
+
+      <!-- فیلترها -->
+      <div class="col-12 card">
+        <div class="filters">
+          <div class="filter-group">
+            <label for="search">جستجو</label>
+            <input type="text" id="search" placeholder="نام، ایمیل یا تلفن">
+          </div>
+          
+          <div class="filter-group">
+            <label for="status">وضعیت</label>
+            <select id="status">
+              <option value="all">همه وضعیت‌ها</option>
+              <option value="active">فعال</option>
+              <option value="inactive">غیرفعال</option>
+              <option value="pending">در انتظار</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="date">تاریخ ثبت</label>
+            <select id="date">
+              <option value="all">همه تاریخ‌ها</option>
+              <option value="today">امروز</option>
+              <option value="week">هفته جاری</option>
+              <option value="month">ماه جاری</option>
+              <option value="year">سال جاری</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label for="sort">مرتب‌سازی</label>
+            <select id="sort">
+              <option value="newest">جدیدترین</option>
+              <option value="oldest">قدیمی‌ترین</option>
+              <option value="name-asc">نام (صعودی)</option>
+              <option value="name-desc">نام (نزولی)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- جدول مشتریان -->
+      <div class="col-12 card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <h2 style="margin:0;font-size:18px;font-weight:700">لیست مشتریان</h2>
+          <a href="add-customer.html" class="btn" style="background:linear-gradient(90deg,var(--success),#10b981)">➕ افزودن مشتری</a>
+        </div>
+        
+        <table class="customers-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>مشتری</th>
+              <th>اطلاعات تماس</th>
+              <th>تاریخ عضویت</th>
+              <th>اشتراک</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>
+                <div class="customer-info">
+                  <img src="https://i.pravatar.cc/40?img=5" alt="پروفایل" class="customer-avatar">
+                  <div>
+                    <div class="customer-name">رضا محمدی</div>
+                    <div class="customer-id">CUST-1001</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>reza@example.com</div>
+                <div style="font-size:12px;color:var(--muted)">09123456789</div>
+              </td>
+              <td>1402/05/12</td>
+              <td>پرمیوم</td>
+              <td><span class="customer-status status-active">فعال</span></td>
+              <td>
+                <button class="action-btn view-btn">مشاهده</button>
+                <button class="action-btn edit-btn">ویرایش</button>
+                <button class="action-btn delete-btn">حذف</button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>2</td>
+              <td>
+                <div class="customer-info">
+                  <img src="https://i.pravatar.cc/40?img=6" alt="پروفایل" class="customer-avatar">
+                  <div>
+                    <div class="customer-name">مریم احمدی</div>
+                    <div class="customer-id">CUST-1002</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>maryam@example.com</div>
+                <div style="font-size:12px;color:var(--muted)">09129876543</div>
+              </td>
+              <td>1402/06/05</td>
+              <td>رایگان</td>
+              <td><span class="customer-status status-active">فعال</span></td>
+              <td>
+                <button class="action-btn view-btn">مشاهده</button>
+                <button class="action-btn edit-btn">ویرایش</button>
+                <button class="action-btn delete-btn">حذف</button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>3</td>
+              <td>
+                <div class="customer-info">
+                  <img src="https://i.pravatar.cc/40?img=3" alt="پروفایل" class="customer-avatar">
+                  <div>
+                    <div class="customer-name">علی رضایی</div>
+                    <div class="customer-id">CUST-1003</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>ali@example.com</div>
+                <div style="font-size:12px;color:var(--muted)">09121234567</div>
+              </td>
+              <td>1402/07/18</td>
+              <td>استاندارد</td>
+              <td><span class="customer-status status-inactive">غیرفعال</span></td>
+              <td>
+                <button class="action-btn view-btn">مشاهده</button>
+                <button class="action-btn edit-btn">ویرایش</button>
+                <button class="action-btn delete-btn">حذف</button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>4</td>
+              <td>
+                <div class="customer-info">
+                  <img src="https://i.pravatar.cc/40?img=4" alt="پروفایل" class="customer-avatar">
+                  <div>
+                    <div class="customer-name">سارا کریمی</div>
+                    <div class="customer-id">CUST-1004</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>sara@example.com</div>
+                <div style="font-size:12px;color:var(--muted)">09127654321</div>
+              </td>
+              <td>1402/08/22</td>
+              <td>پرمیوم</td>
+              <td><span class="customer-status status-active">فعال</span></td>
+              <td>
+                <button class="action-btn view-btn">مشاهده</button>
+                <button class="action-btn edit-btn">ویرایش</button>
+                <button class="action-btn delete-btn">حذف</button>
+              </td>
+            </tr>
+            
+            <tr>
+              <td>5</td>
+              <td>
+                <div class="customer-info">
+                  <img src="https://i.pravatar.cc/40?img=7" alt="پروفایل" class="customer-avatar">
+                  <div>
+                    <div class="customer-name">محمد حسینی</div>
+                    <div class="customer-id">CUST-1005</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div>mohammad@example.com</div>
+                <div style="font-size:12px;color:var(--muted)">09126543219</div>
+              </td>
+              <td>1402/09/30</td>
+              <td>استاندارد</td>
+              <td><span class="customer-status status-pending">در انتظار</span></td>
+              <td>
+                <button class="action-btn view-btn">مشاهده</button>
+                <button class="action-btn edit-btn">ویرایش</button>
+                <button class="action-btn delete-btn">حذف</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- صفحه‌بندی -->
+        <div class="pagination">
+          <button class="page-btn">❮ قبلی</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">بعدی ❯</button>
+        </div>
+      </div>
+    </section>
+
+    <div style="height:24px"></div>
+    <footer style="color:var(--muted);font-size:13px" class="muted">© تمام حقوق برای شما محفوظ است — پنل مدیریت مشتریان</footer>
+  </main>
+</div>
+<script>
+    // برای فعال کردن تم تاریک به صورت پویا
+    document.addEventListener('DOMContentLoaded', function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      
+      // بررسی وضعیت ذخیره شده در localStorage
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        themeToggle.checked = true;
+      }
+      
+      // تغییر تم با کلیک
+      themeToggle.addEventListener('change', function() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', this.checked);
+      });
+    });
+  </script>
+</body>
+</html>
